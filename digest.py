@@ -20,14 +20,15 @@ class Runner:
         for message in messageTexts.itervalues():
             processor.parseEmail(message)
         print "\n\n\n\n"
-        print processor.getDigest()
-        # self.fetcher.createMessage(processor.getDigest())
+        digest = processor.getDigest()
+        print (digest)
+        self.fetcher.createMessage(digest)
 
     def run(self, delay):
         while True:
-            self.process('11-Nov-2016')
+            self.process('today')
             time.sleep(delay)
 
 if __name__ == '__main__':
     runner = Runner()
-    runner.run(300)
+    runner.run(3600)

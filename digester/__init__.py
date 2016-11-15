@@ -23,8 +23,15 @@ class Ticket:
 
     def addUpdate(self, update):
         self.shortChangeList.append(update.getActionLine())
-        self.summary = update.getTicketData()
-        self.title = update.getTitle()
+
+        summary = update.getTicketData()
+        if (summary):
+            self.summary = summary
+
+        title = update.getTitle()
+        if title:
+            self.title = title
+
         change = update.getChange()
         if change:
             self.changeList.append(change)
@@ -36,6 +43,7 @@ class Update:
         self.message = message
         self.parsedEmail = email.message_from_string(self.message)
         self.body = self.parsedEmail.get_payload()
+        print (self.body)
 
     def getKey(self):
         subject = self.parsedEmail['Subject']
@@ -68,7 +76,15 @@ class Update:
         key = self.getKey()
         regex = '%s (.*) %s' % (re.escape(actor), re.escape(key))
         m = re.search(regex, self.body)
-        return m.group
+        if m:
+            return m.group
+        else:
+            # Is it a "work on ticket started by user" alert?
+            regex = '(Work on %s started by .*)' % re.escape(key)
+            m = re.search(regex, self.body)
+            if m:
+                return m.group
+
 
     def getTicketData(self):
         verb = self.getVerb()
