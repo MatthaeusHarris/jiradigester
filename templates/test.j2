@@ -1,0 +1,61 @@
+<html>
+<head>
+    <title>JIRA Notifications Digest</title>
+    <style type="text/css">
+        .ticket {
+            display: block;
+            padding-bottom: 20px;
+        }
+
+        .change {
+            display: block;
+        }
+
+        .ticketName {
+            font-weight: bold;
+        }
+
+        .ticketSummary {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h1>Summary of Changes</h1>
+<div>
+    {% for ticket in tickets %}
+        <div class="ticket">
+            <div class="ticketName"><a href="{{ ticket.metadata.URL }}">{{ ticket.key }}: {{ ticket.title }}</a></div>
+            {% for change in ticket.shortChangeList %}
+                <div class="change">
+                    {{ change }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+<h1>Full Changes</h1>
+<div>
+    {% for ticket in tickets %}
+        <div class="ticket">
+        <div class="ticketName">
+            <a href="{{ ticket.metadata.URL }}">{{ ticket.key }}: {{ ticket.title }}</a>
+        </div>
+        <div class="ticketSummary">
+            {% for line in ticket.summary %}
+                <pre>{{ line }}</pre>
+            {% endfor %}
+        </div>
+        {% for change in ticket.changeList %}
+            <div class="change">
+                {{ change }}
+            </div>
+        {% endfor %}
+        <div class="debug">
+            <pre>{{ ticket }}</pre>
+        </div>
+        </div>
+    {% endfor %}
+</div>
+</body>
+</html>

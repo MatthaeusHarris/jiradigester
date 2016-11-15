@@ -20,9 +20,12 @@ class Runner:
         for message in messageTexts.itervalues():
             processor.parseEmail(message)
         print "\n\n\n\n"
-        digest = processor.getDigest()
-        print (digest)
-        self.fetcher.createMessage(digest)
+        # digest = processor.getDigest()
+        # print (digest)
+        # self.fetcher.createMessage(digest)
+        digest = processor.templateDigest('templates/test.j2')
+        self.fetcher.createMessage(digest, "html")
+        print(digest)
 
     def run(self, delay):
         while True:

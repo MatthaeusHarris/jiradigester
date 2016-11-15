@@ -53,8 +53,8 @@ class ImapConnection:
             return {}
         return {id: self.fetchMessageTextById(id) for id in idList}
 
-    def createMessage(self, message):
-        msg = MIMEText(message)
+    def createMessage(self, message, MIMEType="plain"):
+        msg = MIMEText(message, MIMEType)
         msg['Subject'] = "JIRA Digest"
         msg['From'] = self.username
         msg['To'] = self.username

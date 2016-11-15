@@ -3,6 +3,7 @@ __version__ = "0.0.1"
 
 import re
 import email
+from jinja2 import Template
 
 separator = '=' * 40
 
@@ -13,6 +14,8 @@ class Ticket:
         self.title = ""
         self.summary = ""
         self.description = ""
+        self.url = ""
+        self.metadata = ""
 
         self.shortChangeList = []
         self.truncatedChangeList = []
@@ -36,6 +39,30 @@ class Ticket:
         if change:
             self.changeList.append(change)
             self.truncatedChangeList.append(change[0:5])
+
+        self.metadata = self.parseDescription()
+
+
+    def parseDescription(self):
+        if self.summary:
+            metadataBlock = []
+            for line in self.summary:
+                if line.strip() == "":
+                    break
+                metadataBlock.append(line)
+            return {item[0]: item[1] for item in [line.strip().split(': ') for line in metadataBlock if line.find(": ") > 0]}
+
+    def getDictionary(self):
+        changeList = ["<br />".join(changes) for changes in self.changeList]
+        tempTicket = {
+            "key": self.key,
+            "title": self.title,
+            "summary": self.summary,
+            "shortChangeList": self.shortChangeList,
+            "changeList": changeList,
+            "metadata": self.metadata
+        }
+        return tempTicket
 
 
 class Update:
@@ -125,8 +152,8 @@ class Update:
                 if line.startswith('--'):
                     state = 'END_FOUND'
                     break;
-                if len(line) > 2:
-                    ticketData.append(line[2:])
+                # if len(line) > 2:
+                ticketData.append(line[2:])
         return ticketData
 
     def getChange(self):
@@ -200,3 +227,13 @@ class Digester:
             returnString = returnString + separator + "\r\n\r\n"
         return returnString
 
+    def templateDigest(self, template):
+        with open(template, 'r') as templateFile:
+            templateText = templateFile.read()
+        jinjaTemplate = Template(templateText)
+        tickets = self.prepareTicketList()
+        return jinjaTemplate.render({'tickets': tickets})
+
+    def prepareTicketList(self):
+        tickets = [ticket.getDictionary() for ticket in self.tickets.itervalues()]
+        return tickets
